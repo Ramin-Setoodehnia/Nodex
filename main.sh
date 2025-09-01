@@ -17,9 +17,7 @@ fatal(){ log red    "[FATAL] $1"; exit "${2:-1}"; }
 info(){ log cyan    "[INFO] $1"; }
 
 # ==================== Config ====================
-RAW_BASE="https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main"
 VERSIONS=( "v1.3" )   # در آینده فقط اضافه کن: ("v1.3" "v1.4" ...)
-INSTALL_ARGS=( "--install" )
 SUDO_CMD=""
 
 # ==================== Helpers ====================
@@ -38,19 +36,16 @@ detect_sudo(){
   fi
 }
 
-run_install(){
-  local ver="$1"
-  local url="${RAW_BASE}/${ver}/install.sh"
-  section "Run installer for ${ver}"
-  info "Fetching: ${url}"
+ver_1_3(){
+
   need_curl
   detect_sudo
 
-  # اجرای مستقیم اسکریپت نصب‌گر بدون شکست خط و backslash
-  if curl -fsSL "$url" | ${SUDO_CMD} bash -s -- "${INSTALL_ARGS[@]}"; then
-    ok "Installer finished for ${ver}"
+curl -fsSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh -o /opt/dds-nodex/install.sh && chmod +x /opt/dds-nodex/install.sh && /opt/dds-nodex/install.sh
+  if [[ $? -ne 0 ]]; then
+    fatal "Installation script for v1.3 failed."
   else
-    fatal "Install failed for ${ver}"
+    ok "Installation script for v1.3 completed."
   fi
 }
 
@@ -79,7 +74,7 @@ main(){
 
     if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#VERSIONS[@]} )); then
       local ver="${VERSIONS[$((choice-1))]}"
-      run_install "$ver"
+      ver_1_3 
       exit 0
     else
       warn "Invalid choice."
