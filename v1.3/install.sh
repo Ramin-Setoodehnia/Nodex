@@ -329,13 +329,7 @@ quick_start(){
   fi
 }
 
-update_stack(){
-  section "Update (pull/build/up)"
-  validate_files
-  need_compose
-  (cd "${APP_HOME}" && "${COMPOSE_CMD[@]}" pull || true; "${COMPOSE_CMD[@]}" build; "${COMPOSE_CMD[@]}" up -d)
-  success "Updated."
-}
+
 
 # ==================== High-level ====================
 install_dds_nodex(){
@@ -367,7 +361,6 @@ Usage:
   $(basename "$0")                  # Interactive menu (recommended)
   $(basename "$0") --install        # Non-interactive install
   $(basename "$0") --quick          # Quick Start (install or status+logs)
-  $(basename "$0") --update         # Pull/Build/Up
   $(basename "$0") --uninstall      # Non-interactive uninstall (dangerous)
   $(basename "$0") --status         # Show compose status
   $(basename "$0") --logs           # Show recent logs
@@ -397,7 +390,6 @@ parse_flags(){
     case "$a" in
       --install) ACTION="install" ;;
       --quick) ACTION="quick" ;;
-      --update) ACTION="update" ;;
       --uninstall) ACTION="uninstall" ;;
       --status) ACTION="status" ;;
       --logs) ACTION="logs" ;;
@@ -438,15 +430,12 @@ draw_menu(){
   ce green "│ $(ce green ' 4)') Restart Service          (docker compose restart)                      $(ce green '│')"
   ce green "│____________________________________________________________________________│"
   ce green "│                                                                            │"
-  ce green "│ $(ce green ' 5)') Update                   (pull / build / up)                           $(ce green '│')"
+  ce green "│ $(ce green ' 5)') Edit Config              (backup + open in Nano Editor)                $(ce green '│')"
+  ce green "│                                                                            │"
+  ce green "│ $(ce green ' 6)') Edit .env                (${APP_HOME}/.env)                         $(ce green '│')"
   ce green "│____________________________________________________________________________│"
   ce green "│                                                                            │"
-  ce green "│ $(ce green ' 6)') Edit Config              (backup + open in Nano Editor)                $(ce green '│')"
-  ce green "│                                                                            │"
-  ce green "│ $(ce green ' 7)') Edit .env                (${APP_HOME}/.env)                         $(ce green '│')"
-  ce green "│____________________________________________________________________________│"
-  ce green "│                                                                            │"
-  ce green "│ $(ce green ' 8)') Install 3x-ui Panel      (from MHSanaei Github)                        $(ce green '│')"
+  ce green "│ $(ce green ' 7)') Install 3x-ui Panel      (from MHSanaei Github)                        $(ce green '│')"
   ce green "│____________________________________________________________________________│"
   ce green "│                                                                            │"
   ce green "│ $(ce red ' X)') Uninstall                (DANGEROUS – double confirmation)             $(ce green '│')"
@@ -475,10 +464,9 @@ main_menu(){
       2) service_status; pause ;;
       3) show_logs 100; read -p "Follow live logs? [y/N]: " -r; [[ "${REPLY:-}" =~ ^[Yy]$ ]] && tail_follow_logs; pause ;;
       4) restart_service; pause ;;
-      5) update_stack; pause ;;
-      6) edit_config; pause ;;
-      7) edit_env; pause ;;
-      8) section "Install 3x-ui Panel"
+      5) edit_config; pause ;;
+      6) edit_env; pause ;;
+      7) section "Install 3x-ui Panel"
          if confirm "This will run a remote script from the Internet. Proceed?"; then
            bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
          else
@@ -499,7 +487,6 @@ if [[ -n "${ACTION:-}" ]]; then
   case "$ACTION" in
     install) require_root; install_dds_nodex ;;
     quick) require_root; quick_start ;;
-    update) require_root; update_stack ;;
     uninstall) require_root; NONINTERACTIVE=true; uninstall_stack ;;
     status) service_status ;;
     logs) show_logs 100 ;;
