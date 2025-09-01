@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DDS-Nodex Version Picker (clean, CRLF-safe)
+# DDS-Nodex Version Picker (clean, CRLF-safe, no line-continuations)
 set -Eeuo pipefail
 IFS=$'\n\t'
 
@@ -17,10 +17,7 @@ fatal(){ log red    "[FATAL] $1"; exit "${2:-1}"; }
 info(){ log cyan    "[INFO] $1"; }
 
 # ==================== Config ====================
-VERSIONS=( "v1.3" )
-INSTALL_URL_V13="https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh"
-TARGET_DIR="/opt/dds-nodex"
-TARGET_FILE="${TARGET_DIR}/install.sh"
+VERSIONS=( "v1.3" )   # در آینده فقط اضافه کن: ("v1.3" "v1.4" ...)
 SUDO_CMD=""
 
 # ==================== Helpers ====================
@@ -39,37 +36,26 @@ detect_sudo(){
   fi
 }
 
-ensure_target_dir(){
-  ${SUDO_CMD} mkdir -p "${TARGET_DIR}" || fatal "Failed to create ${TARGET_DIR}"
-  ${SUDO_CMD} chmod 755 "${TARGET_DIR}" || true
-}
-
 ver_1_3(){
+
   need_curl
   detect_sudo
-  ensure_target_dir
 
-  section "Downloading installer for v1.3 → ${TARGET_FILE}"
-  # نوشتن امن در مسیر روت با sudo + tee
-  if curl -fsSL "${INSTALL_URL_V13}" | ${SUDO_CMD} tee "${TARGET_FILE}" >/dev/null; then
-    ${SUDO_CMD} chmod +x "${TARGET_FILE}"
-    ok "Installer saved to ${TARGET_FILE} and made executable."
+sudo mkdir -p /opt/dds-nodex && curl -fsSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh | sudo tee /opt/dds-nodex/install.sh >/dev/null && sudo chmod +x /opt/dds-nodex/install.sh && sudo bash /opt/dds-nodex/install.sh --install
+  if [[ $? -ne 0 ]]; then
+    fatal "Installation script for v1.3 failed."
   else
-    fatal "Failed to download installer (curl)."
-  fi
-
-  section "Running installer"
-  if ${SUDO_CMD} bash "${TARGET_FILE}" --install; then
-    ok "Installation completed successfully."
-  else
-    fatal "Installation failed."
+    ok "Installation script for v1.3 completed."
   fi
 }
 
 show_menu(){
   section "DDS-Nodex Version Picker"
   ce green "┌──────────────────────────────────────────────────────────┐"
-  ce green "│  1 )  v1.3                                              │"
+  local i
+  for i in "${!VERSIONS[@]}"; do
+    ce green "│  $(printf '%2d' $((i+1))) )  ${VERSIONS[$i]}                                        │"
+  done
   ce green "│  0 )  Exit                                              │"
   ce green "└──────────────────────────────────────────────────────────┘"
 }
@@ -81,11 +67,18 @@ main(){
     read -r -p "Select a version [0-${#VERSIONS[@]}]: " choice
     [[ -z "${choice:-}" ]] && { warn "No input."; continue; }
 
-    case "$choice" in
-      0) ce bold "Goodbye!"; exit 0 ;;
-      1) ver_1_3; exit 0 ;;
-      *) warn "Invalid choice." ;;
-    esac
+    if [[ "$choice" == "0" ]]; then
+      ce bold "Goodbye!"
+      exit 0
+    fi
+
+    if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#VERSIONS[@]} )); then
+      local ver="${VERSIONS[$((choice-1))]}"
+      ver_1_3 
+      exit 0
+    else
+      warn "Invalid choice."
+    fi
   done
 }
 
