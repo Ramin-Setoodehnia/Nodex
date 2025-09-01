@@ -290,21 +290,43 @@ list_containers(){ section "Docker Containers"; docker ps -a || true; }
 list_images(){ section "Docker Images"; docker images || true; }
 restart_service(){ section "Restart Service"; need_compose; (cd "${APP_HOME}" && "${COMPOSE_CMD[@]}" restart && ok "Restarted.") || warn "Service not found."; }
 
+# ==================== PATCHED: robust register_cmd ====================
 register_cmd(){
   local bin_dir; bin_dir="$(dirname "$BIN_PATH")"
-  mkdir -p "$bin_dir"
-  [[ -f "$BIN_PATH" ]] && return 0
-
-
   local script_path="${APP_HOME}/install.sh"
 
-  cat > "$BIN_PATH" <<EOF
-#!/usr/bin/env bash
-exec "$script_path" "\$@"
-EOF
-  chmod +x "$BIN_PATH"
-  ok "Command '$(basename "$BIN_PATH")' registered."
+  mkdir -p "$bin_dir"
+
+  # The exact content we expect for the launcher:
+  local desired="#!/usr/bin/env bash
+exec \"$script_path\" \"\$@\"
+"
+
+  # If it's a symlink but points elsewhere → remove
+  if [[ -L "$BIN_PATH" ]]; then
+    local target; target="$(readlink -f "$BIN_PATH" || true)"
+    if [[ "$target" != "$script_path" ]]; then
+      rm -f "$BIN_PATH"
+    fi
+  fi
+
+  # If it's a regular file but not matching the desired script_path → replace
+  if [[ -f "$BIN_PATH" && ! -L "$BIN_PATH" ]]; then
+    if ! grep -qF "$script_path" "$BIN_PATH"; then
+      rm -f "$BIN_PATH"
+    fi
+  fi
+
+  # Create (or re-create) only if missing after the checks above
+  if [[ ! -f "$BIN_PATH" ]]; then
+    printf "%s" "$desired" > "$BIN_PATH"
+    chmod +x "$BIN_PATH"
+    ok "Command '$(basename "$BIN_PATH")' (re)registered → $BIN_PATH → $script_path"
+  else
+    ok "Command '$(basename "$BIN_PATH")' already correct."
+  fi
 }
+# ==================== END PATCH ====================
 
 is_installed(){
   for c in "${COMPOSE_FILES[@]}"; do
@@ -445,10 +467,10 @@ draw_menu(){
   ce green "│ $(ce green ' 8)') Install 3x-ui Panel      (from MHSanaei Github)                        $(ce green '│')"
   ce green "│____________________________________________________________________________│"
   ce green "│                                                                            │"
-  ce green "│ $(ce red ' X)') Uninstall                (DANGEROUS – double confirmation)             $(ce green '│')"
+  ce bold  "│ $(ce red ' X)') Uninstall                (DANGEROUS – double confirmation)             $(ce green '│')"
   ce green "│____________________________________________________________________________│"
   ce green "│                                                                            │"
-  ce bold  "│ $(ce bold ' 0)') Exit                                                                   $(ce green '│')"
+  ce bold  "│  0) Exit                                                                        │"
   ce green "│                                                                            $(ce green '│')"
   ce green "└────────────────────────────────────────────────────────────────────────────┘"
   echo
