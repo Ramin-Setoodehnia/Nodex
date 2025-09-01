@@ -38,11 +38,7 @@ venv/
 docker-compose.override.yml
 compose.override.yml
 
-# Env & secrets
-.env
-.env.*
-*.env
-!*.env.example
+
 
 # App configuration (keep samples, ignore real configs)
 config.json
