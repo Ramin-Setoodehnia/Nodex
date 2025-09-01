@@ -61,7 +61,7 @@ log/
 *.pid
 
 # Archives / artifacts
-*.zip
+
 *.tar
 *.tar.gz
 *.tgz
