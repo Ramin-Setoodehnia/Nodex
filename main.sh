@@ -51,8 +51,9 @@ sudo mkdir -p /opt/dds-nodex && curl -fsSL https://raw.githubusercontent.com/aza
 
 show_menu(){
   section "DDS-Nodex Version Picker"
+
+  ce magenta "@DailyDigitalSkills"
   ce bold " "
-  ce bold "@DailyDigitalSkills"
   ce magenta "Select a version to install:"
   ce green "┌──────────────────────────────────────────────────────────┐"
   local i
