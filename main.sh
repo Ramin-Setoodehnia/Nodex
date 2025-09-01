@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# DDS-Nodex Version Picker (clean, CRLF-safe, no line-continuations)
 set -Eeuo pipefail
 IFS=$'\n\t'
 
@@ -8,61 +8,83 @@ ce() { local c="$1"; shift || true; local code=0
   case "$c" in red)code=31;;green)code=32;;yellow)code=33;;blue)code=34;;magenta)code=35;;cyan)code=36;;bold)code=1;; *)code=0;; esac
   echo -e "\033[${code}m$*\033[0m"
 }
+ts() { date '+%Y-%m-%d %H:%M:%S'; }
+log() { ce "$1" "[$(ts)] $2"; }
 section(){ ce magenta "\n────────────────────────────────────────────────────"; ce bold " $1"; ce magenta "────────────────────────────────────────────────────\n"; }
-ok()  { ce green   "[OK]   $1"; }
-warn(){ ce yellow  "[WARN] $1"; }
-fatal(){ ce red    "[FATAL] $1"; exit 1; }
+ok()  { log green   "[OK]   $1"; }
+warn(){ log yellow  "[WARN] $1"; }
+fatal(){ log red    "[FATAL] $1"; exit "${2:-1}"; }
+info(){ log cyan    "[INFO] $1"; }
 
-need_curl(){
-  command -v curl >/dev/null 2>&1 || fatal "curl is required. Install curl and try again."
+# ==================== Config ====================
+RAW_BASE="https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main"
+VERSIONS=( "v1.3" )   # در آینده فقط اضافه کن: ("v1.3" "v1.4" ...)
+INSTALL_ARGS=( "--install" )
+SUDO_CMD=""
+
+# ==================== Helpers ====================
+need_curl(){ command -v curl >/dev/null 2>&1 || fatal "curl is required. Install curl and try again."; }
+
+detect_sudo(){
+  if [[ "$(id -u)" -eq 0 ]]; then
+    SUDO_CMD=""
+  else
+    if command -v sudo >/dev/null 2>&1; then
+      SUDO_CMD="sudo"
+    else
+      warn "sudo not found and you are not root. Trying without sudo (may fail)."
+      SUDO_CMD=""
+    fi
+  fi
 }
 
-ensure_dirs(){
-  sudo mkdir -p /opt/dds-nodex || fatal "Failed to create installation directory"
+run_install(){
+  local ver="$1"
+  local url="${RAW_BASE}/${ver}/install.sh"
+  section "Run installer for ${ver}"
+  info "Fetching: ${url}"
+  need_curl
+  detect_sudo
+
+  # اجرای مستقیم اسکریپت نصب‌گر بدون شکست خط و backslash
+  if curl -fsSL "$url" | ${SUDO_CMD} bash -s -- "${INSTALL_ARGS[@]}"; then
+    ok "Installer finished for ${ver}"
+  else
+    fatal "Install failed for ${ver}"
+  fi
 }
 
 show_menu(){
   section "DDS-Nodex Version Picker"
   ce green "┌──────────────────────────────────────────────────────────┐"
-  ce green "│  1 )  v1.3                                              │"
+  local i
+  for i in "${!VERSIONS[@]}"; do
+    ce green "│  $(printf '%2d' $((i+1))) )  ${VERSIONS[$i]}                                        │"
+  done
   ce green "│  0 )  Exit                                              │"
   ce green "└──────────────────────────────────────────────────────────┘"
 }
 
 # ==================== Main ====================
-while true; do
-  show_menu
-  read -p "Select a version [0-1]: " -r choice
-  [[ -z "${choice:-}" ]] && { warn "No input."; continue; }
+main(){
+  while true; do
+    show_menu
+    read -r -p "Select a version [0-${#VERSIONS[@]}]: " choice
+    [[ -z "${choice:-}" ]] && { warn "No input."; continue; }
 
-  if [[ "$choice" == "0" ]]; then
-    ce bold "Goodbye!"
-    exit 0
-  fi
-
-  if [[ "$choice" == "1" ]]; then
-    section "Downloading installer for v1.3"
-    need_curl
-    ensure_dirs
-    
-    # دانلود و نصب در یک بلوک
-    if curl -fsSL "https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh" -o "install.sh"; then
-      chmod +x "install.sh" && \
-      sudo mv "install.sh" "/opt/dds-nodex/install.sh" && \
-      sudo chown root:root "/opt/dds-nodex/install.sh" && \
-      ok "Installer downloaded and made executable." && \
-      sudo bash "/opt/dds-nodex/install.sh"
-      
-      if [ $? -eq 0 ]; then
-        ok "Installation completed successfully"
-        exit 0
-      else
-        fatal "Installation failed"
-      fi
-    else
-      fatal "Failed to download installer"
+    if [[ "$choice" == "0" ]]; then
+      ce bold "Goodbye!"
+      exit 0
     fi
-  else
-    warn "Invalid choice."
-  fi
-done
+
+    if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#VERSIONS[@]} )); then
+      local ver="${VERSIONS[$((choice-1))]}"
+      run_install "$ver"
+      exit 0
+    else
+      warn "Invalid choice."
+    fi
+  done
+}
+
+main "$@"
