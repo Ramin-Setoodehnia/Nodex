@@ -1,0 +1,52 @@
+name: Package Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version folder to package (e.g. v1.3)"
+        required: true
+        type: string
+
+permissions:
+  contents: write   # برای ساخت/آپلود Release
+
+jobs:
+  zip-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate folder structure
+        run: |
+          set -e
+          VERSION="${{ github.event.inputs.version }}"
+          test -d "$VERSION/dds-nodex-${VERSION}" || {
+            echo "Expected folder: ${VERSION}/dds-nodex-${VERSION}/ not found."
+            exit 1
+          }
+          echo "Ok: found ${VERSION}/dds-nodex-${VERSION}/"
+
+      - name: Create ZIP inside the version folder
+        run: |
+          set -e
+          VERSION="${{ github.event.inputs.version }}"
+          cd "$VERSION"
+          zip -r "${VERSION}.zip" "dds-nodex-${VERSION}/"
+          ls -lah
+
+      - name: Create or update GitHub Release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: ${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ github.event.inputs.version }}/${{ github.event.inputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
