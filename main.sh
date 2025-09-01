@@ -54,9 +54,9 @@ show_menu(){
   ce green "┌──────────────────────────────────────────────────────────┐"
   local i
   for i in "${!VERSIONS[@]}"; do
-    ce green "│  $(printf '%2d' $((i+1))) )  ${VERSIONS[$i]}                                        │"
+    ce green "│  $(printf '%2d' $((i+1))) )  ${VERSIONS[$i]}                                             │"
   done
-  ce green "│  0 )  Exit                                              │"
+  ce green "│  0 )  Exit                                               │"
   ce green "└──────────────────────────────────────────────────────────┘"
 }
 
