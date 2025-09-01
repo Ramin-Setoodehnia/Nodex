@@ -40,8 +40,10 @@ while true; do
     need_curl
     curl -fsSL "https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh" -o install.sh \
       && chmod +x install.sh \
-      && bash install.sh \
-      && ok "Installer finished for v1.3" \
+      && sudo mv install.sh /opt/dds-nodex/install.sh \
+      && sudo chown root:root /opt/dds-nodex/install.sh \
+      && ok "Installer downloaded and made executable."
+      && /opt/dds-nodex/install.sh
       && exit 0 \
       || fatal "Failed to install v1.3"
   else
