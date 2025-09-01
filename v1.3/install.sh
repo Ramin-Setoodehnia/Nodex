@@ -295,7 +295,8 @@ register_cmd(){
   mkdir -p "$bin_dir"
   [[ -f "$BIN_PATH" ]] && return 0
 
-  local script_path; script_path="$(realpath "${BASH_SOURCE[0]}")"
+
+  local script_path="${APP_HOME}/install.sh"
 
   cat > "$BIN_PATH" <<EOF
 #!/usr/bin/env bash
