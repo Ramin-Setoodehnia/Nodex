@@ -17,6 +17,10 @@ need_curl(){
   command -v curl >/dev/null 2>&1 || fatal "curl is required. Install curl and try again."
 }
 
+ensure_dirs(){
+  sudo mkdir -p /opt/dds-nodex || fatal "Failed to create installation directory"
+}
+
 show_menu(){
   section "DDS-Nodex Version Picker"
   ce green "┌──────────────────────────────────────────────────────────┐"
@@ -32,20 +36,32 @@ while true; do
   [[ -z "${choice:-}" ]] && { warn "No input."; continue; }
 
   if [[ "$choice" == "0" ]]; then
-    ce bold "Goodbye!"; exit 0
+    ce bold "Goodbye!"
+    exit 0
   fi
 
   if [[ "$choice" == "1" ]]; then
     section "Downloading installer for v1.3"
     need_curl
-    curl -fsSL "https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh" -o install.sh \
-      && chmod +x install.sh \
-      && sudo mv install.sh /opt/dds-nodex/install.sh \
-      && sudo chown root:root /opt/dds-nodex/install.sh \
-      && ok "Installer downloaded and made executable."
-      && /opt/dds-nodex/install.sh
-      && exit 0 \
-      || fatal "Failed to install v1.3"
+    ensure_dirs
+    
+    # دانلود و نصب در یک بلوک
+    if curl -fsSL "https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh" -o "install.sh"; then
+      chmod +x "install.sh" && \
+      sudo mv "install.sh" "/opt/dds-nodex/install.sh" && \
+      sudo chown root:root "/opt/dds-nodex/install.sh" && \
+      ok "Installer downloaded and made executable." && \
+      sudo bash "/opt/dds-nodex/install.sh"
+      
+      if [ $? -eq 0 ]; then
+        ok "Installation completed successfully"
+        exit 0
+      else
+        fatal "Installation failed"
+      fi
+    else
+      fatal "Failed to download installer"
+    fi
   else
     warn "Invalid choice."
   fi
