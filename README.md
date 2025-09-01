@@ -184,13 +184,15 @@ curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/ma
 
 #### پس از اجرا شما هر بار میتوانید با دستور dds-nodex  منو را فراخوانی کنید.
 
+
 ## ❤️ حمایت مالی (Donate)
 
 اگر Nodex برای شما مفید بود، می‌توانید از پروژه حمایت کنید:
 
+
 | Cryptocurrency    | Wallet Address                                   |
-| -- |  |
-| USDR (BEP20)     | 0xFA231ce9128AC097F70F5efcfFb3d918645e1Ca9 |
+| ----------------- | ------------------------------------------------ |
+| USDT (BEP20)      | 0xFA231ce9128AC097F70F5efcfFb3d918645e1Ca9 |
 | DogeCoin (DOGE)   | DRXjceAoxBRzNsNgVR3GduPSau4xiv179y               |
 | TRON (TRX-TRC20 ) | TJWnK1fCcxwsemyYgYjebKnsBfofCFy3Pc               |
 
