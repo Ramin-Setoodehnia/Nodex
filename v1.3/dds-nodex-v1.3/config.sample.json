@@ -1,0 +1,15 @@
+{
+  "central_server": {
+    "url": "http://host.docker.internal:PORT/WEBPATH",
+    "username": "username",
+    "password": "password"
+  },
+  "nodes": [
+    {
+      "url": "http://IP:PORT/WEBPATH",
+
+      "username": "username",
+      "password": "password"
+    }
+  ]
+}
