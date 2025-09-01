@@ -154,14 +154,35 @@ download_extract(){
   section "Download & Extract"
   parse_zip
   local tmp; tmp="$(mktemp --suffix=.zip)"
+
   if [[ -n "${ZIP_PATH:-}" ]]; then
-    info "Copying local archive: $ZIP_PATH"; cp -f "$ZIP_PATH" "$tmp"
+    info "Copying local archive: $ZIP_PATH"
+    cp -f "$ZIP_PATH" "$tmp"
   else
-    info "Downloading: $ZIP_URL"; curl -fSL --retry 3 --retry-delay 2 "$ZIP_URL" -o "$tmp"
+    info "Downloading: $ZIP_URL"
+    curl -fSL --retry 3 --retry-delay 2 "$ZIP_URL" -o "$tmp"
   fi
   ok "Archive ready."
-  info "Unpacking to ${APP_HOME}…"; mkdir -p "${APP_HOME}"; unzip -oq "$tmp" -d "${APP_HOME}"; rm -f "$tmp"; ok "Unpacked."
+
+  info "Unpacking to ${APP_HOME}…"
+  mkdir -p "${APP_HOME}"
+  unzip -oq "$tmp" -d "${APP_HOME}"
+  rm -f "$tmp"
+  ok "Unpacked."
+
+  # --- نکتهٔ مهم: اگر فقط یک دایرکتوری تاپ‌لول بود، محتواش رو به APP_HOME «پروموت» کن
+  shopt -s nullglob dotglob
+  local entries=("${APP_HOME}"/*)
+  if (( ${#entries[@]} == 1 )) && [[ -d "${entries[0]}" ]]; then
+    local top="${entries[0]}"
+    info "Detected single top-level dir '$(basename "$top")' → promoting contents to ${APP_HOME}"
+    mv "${top}/"* "${APP_HOME}/" 2>/dev/null || true
+    rmdir "$top" 2>/dev/null || true
+    ok "Contents promoted."
+  fi
+  shopt -u nullglob dotglob
 }
+
 
 setup_config(){
   section "Configuration"

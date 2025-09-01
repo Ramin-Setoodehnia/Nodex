@@ -51,12 +51,15 @@ sudo mkdir -p /opt/dds-nodex && curl -fsSL https://raw.githubusercontent.com/aza
 
 show_menu(){
   section "DDS-Nodex Version Picker"
+  ce bold " "
+  ce bold "@DailyDigitalSkills"
+  ce magenta "Select a version to install:"
   ce green "┌──────────────────────────────────────────────────────────┐"
   local i
   for i in "${!VERSIONS[@]}"; do
-    ce green "│  $(printf '%2d' $((i+1))) )  ${VERSIONS[$i]}                                             │"
+    ce green "│  $(printf '%2d' $((i+1))) )  ${VERSIONS[$i]}                                              │"
   done
-  ce green "│  0 )  Exit                                               │"
+  ce green "│   0 )  Exit                                              │"
   ce green "└──────────────────────────────────────────────────────────┘"
 }
 
