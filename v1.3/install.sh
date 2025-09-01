@@ -160,7 +160,23 @@ download_extract(){
     info "Downloading: $ZIP_URL"; curl -fSL --retry 3 --retry-delay 2 "$ZIP_URL" -o "$tmp"
   fi
   ok "Archive ready."
-  info "Unpacking to ${APP_HOME}…"; mkdir -p "${APP_HOME}"; unzip -oq "$tmp" -d "${APP_HOME}"; rm -f "$tmp"; ok "Unpacked."
+  info "Unpacking to ${APP_HOME}…"
+  mkdir -p "${APP_HOME}"
+  unzip -oq "$tmp" -d "${APP_HOME}"
+  rm -f "$tmp"
+  ok "Unpacked."
+
+  shopt -s nullglob dotglob
+  local entries=("${APP_HOME}"/*)
+  if (( ${#entries[@]} == 1 )) && [[ -d "${entries[0]}" ]]; then
+    local top="${entries[0]}"
+    info "Detected single top-level dir '$(basename "$top")' → promoting its contents to ${APP_HOME}"
+    mv "${top}/"* "${APP_HOME}/" 2>/dev/null || true
+    rmdir "$top" 2>/dev/null || true
+    ok "Contents promoted."
+  fi
+  shopt -u nullglob dotglob
+  # --------------------------------------------------------------
 }
 
 setup_config(){
