@@ -31,13 +31,13 @@ jobs:
           }
           echo "Ok: found ${VERSION}/dds-nodex-${VERSION}/"
 
-      - name: Create ZIP inside the version folder
+      - name: Create ZIP with contents (no extra folder)
         run: |
           set -e
           VERSION="${{ github.event.inputs.version }}"
-          cd "$VERSION"
-          zip -r "${VERSION}.zip" "dds-nodex-${VERSION}/"
-          ls -lah
+          cd "$VERSION/dds-nodex-${VERSION}"
+          zip -r "../${VERSION}.zip" .
+          ls -lah ..
 
       - name: Create or update GitHub Release and upload asset
         uses: softprops/action-gh-release@v2
