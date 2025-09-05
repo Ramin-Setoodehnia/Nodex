@@ -179,7 +179,7 @@ services:
 </div>
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/main.sh -o main.sh && chmod +x main.sh && ./main.sh
+curl -sSL https://raw.githubusercontent.com/Ramin-Setoodehnia/Nodex/refs/heads/main/main.sh -o main.sh && chmod +x main.sh && ./main.sh
 ```
 
 #### پس از اجرا شما هر بار میتوانید با دستور dds-nodex  منو را فراخوانی کنید.
