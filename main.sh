@@ -17,7 +17,7 @@ fatal(){ log red    "[FATAL] $1"; exit "${2:-1}"; }
 info(){ log cyan    "[INFO] $1"; }
 
 # ==================== Config ====================
-VERSIONS=( "v1.3" )   # در آینده فقط اضافه کن: ("v1.3" "v1.4" ...)
+VERSIONS=( "v1.3" "v1.4" )
 SUDO_CMD=""
 
 # ==================== Helpers ====================
@@ -36,22 +36,26 @@ detect_sudo(){
   fi
 }
 
-ver_1_3(){
-
+install_version(){
+  local ver="$1"
   need_curl
   detect_sudo
 
-sudo mkdir -p /opt/dds-nodex && curl -fsSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/v1.3/install.sh | sudo tee /opt/dds-nodex/install.sh >/dev/null && sudo chmod +x /opt/dds-nodex/install.sh && sudo bash /opt/dds-nodex/install.sh --install
-  if [[ $? -ne 0 ]]; then
-    fatal "Installation script for v1.3 failed."
-  else
-    ok "Installation script for v1.3 completed."
-  fi
+  # آدرس صحیح raw گیت‌هاب (بدون refs/heads)
+  local url="https://raw.githubusercontent.com/azavaxhuman/Nodex/main/${ver}/install.sh"
+  local dst="/opt/dds-nodex/install.sh"
+
+  info "Fetching installer for ${ver} from: ${url}"
+  ${SUDO_CMD} mkdir -p /opt/dds-nodex
+  # اگر tee نیاز به sudo داشته باشد، قبلش SUDO_CMD را می‌گذاریم
+  curl -fsSL "$url" | ${SUDO_CMD} tee "$dst" >/dev/null || fatal "Download failed for ${ver}."
+  ${SUDO_CMD} chmod +x "$dst"
+  ${SUDO_CMD} bash "$dst" --install || fatal "Installation script for ${ver} failed."
+  ok "Installation script for ${ver} completed."
 }
 
 show_menu(){
   section "DDS-Nodex Version Picker"
-
   ce magenta "@DailyDigitalSkills"
   ce bold " "
   ce magenta "Select a version to install:"
@@ -78,7 +82,7 @@ main(){
 
     if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#VERSIONS[@]} )); then
       local ver="${VERSIONS[$((choice-1))]}"
-      ver_1_3 
+      install_version "$ver"
       exit 0
     else
       warn "Invalid choice."
