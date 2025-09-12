@@ -17,7 +17,7 @@ fatal(){ log red    "[FATAL] $1"; exit "${2:-1}"; }
 info(){ log cyan    "[INFO] $1"; }
 
 # ==================== Config ====================
-VERSIONS=( "v1.3" "v1.4" )
+VERSIONS=( "v1.4" )
 SUDO_CMD=""
 
 # ==================== Helpers ====================
