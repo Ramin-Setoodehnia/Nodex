@@ -1,13 +1,9 @@
-# Nodex - Unofficial version of the 3X-ui Node 
-
-
+# Nodex - Unofficial version of the 3X-ui Node
 
 <p align="center">
   <b>همگام‌سازی کامل اینباندها و کلاینت‌ها + همگام‌سازی ترافیک بین سرورها</b><br>
   سبک، ایمن، داکرایز شده، و قابل‌تنظیم با فایل <code>.env</code>
 </p>
-
-
 
 ## ⚡ نــــــودکس
 
@@ -21,8 +17,6 @@
 - ذخیره‌سازی حالت/ترافیک را داخل SQLite (با WAL) انجام می‌دهد.
 
 </div>
-
-
 
 ## 🍀 ویژگی‌ها
 
@@ -40,25 +34,22 @@
 
 </div>
 
-
-
 ## 📁 ساختار و مسیرهای پیش‌فرض
 
 <div dir="rtl">
 
-- داده‌ها و دیتابیس:  `/var/lib/dds-nodex/data`  
-- پیکربندی فقط‌خواندنی: `/var/lib/dds-nodex/config`  
-- فایل پایگاه‌داده: `/var/lib/dds-nodex/data/traffic_state.db`  
-- فایل کانفینگ: `/var/lib/dds-nodex/config/config.json`  
+- داده‌ها و دیتابیس: `/var/lib/dds-nodex/data`
+- پیکربندی فقط‌خواندنی: `/var/lib/dds-nodex/config`
+- فایل پایگاه‌داده: `/var/lib/dds-nodex/data/traffic_state.db`
+- فایل کانفینگ: `/var/lib/dds-nodex/config/config.json`
 
-درون کانتینر:  
-- `DATA_DIR=/app/data`  
-- `DB_FILE=/app/data/traffic_state.db`  
+درون کانتینر:
+
+- `DATA_DIR=/app/data`
+- `DB_FILE=/app/data/traffic_state.db`
 - `CONFIG_FILE=/app/config/config.json`
 
 </div>
-
-
 
 ## 🧩 فایل‌های نمونه مهم
 
@@ -91,12 +82,9 @@
 
 **نکته**: حتما برای نود های خود از SSL استفاده کنید . عدم استفاده از HTTPS امنیت شما را به خطر می اندازد. مسیر پنل معمولاً شبیه `http://IP:PORT` یا `https://IP:PORT/panel` است. `WEBPATH` را مطابق پنل خود بگذارید.
 
-
 ### 2) متغیرهای محیطی (`.env`)
 
 <div dir="rtl">
-
-
 
 </div>
 
@@ -157,18 +145,14 @@ services:
       - /var/lib/dds-nodex/data:/app/data
       - /var/lib/dds-nodex/config:/app/config:ro
     read_only: true
-    tmpfs: [ "/tmp" ]
-    security_opt: [ "no-new-privileges:true" ]
-    cap_drop: [ "ALL" ]
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
     extra_hosts:
       - "host.docker.internal:host-gateway"
 ```
 
-
-
 </div>
-
-
 
 ## 🔌 شروع به کار
 
@@ -179,27 +163,20 @@ services:
 </div>
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/main.sh -o main.sh && chmod +x main.sh && ./main.sh
+curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/install.sh -o install.sh && chmod +x install.sh && ./main.sh
 ```
 
-#### پس از اجرا شما هر بار میتوانید با دستور dds-nodex  منو را فراخوانی کنید.
-
+#### پس از اجرا شما هر بار میتوانید با دستور dds-nodex منو را فراخوانی کنید.
 
 ## ❤️ حمایت مالی (Donate)
 
 اگر Nodex برای شما مفید بود، می‌توانید از پروژه حمایت کنید:
 
-
-| Cryptocurrency    | Wallet Address                                   |
-| ----------------- | ------------------------------------------------ |
+| Cryptocurrency    | Wallet Address                             |
+| ----------------- | ------------------------------------------ |
 | USDT (BEP20)      | 0xFA231ce9128AC097F70F5efcfFb3d918645e1Ca9 |
-| DogeCoin (DOGE)   | DRXjceAoxBRzNsNgVR3GduPSau4xiv179y               |
-| TRON (TRX-TRC20 ) | TJWnK1fCcxwsemyYgYjebKnsBfofCFy3Pc               |
-
-
-
-
-
+| DogeCoin (DOGE)   | DRXjceAoxBRzNsNgVR3GduPSau4xiv179y         |
+| TRON (TRX-TRC20 ) | TJWnK1fCcxwsemyYgYjebKnsBfofCFy3Pc         |
 
 ## 🧠 نحوهٔ کار (High-level)
 
@@ -214,8 +191,6 @@ curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/ma
 
 </div>
 
-
-
 ## 🛡️ نکات امنیتی
 
 <div dir="rtl">
@@ -226,8 +201,6 @@ curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/ma
 **پیشنهاد**: Nodex را پشت یک شبکهٔ داخلی Docker یا سرور داخل همان شبکه/دیتاسنتر با پنل‌ها قرار دهید.
 
 </div>
-
-
 
 ## 🔍 عیب‌یابی و لاگ‌ها
 
@@ -240,6 +213,7 @@ curl -sSL https://raw.githubusercontent.com/azavaxhuman/Nodex/refs/heads/main/ma
 ```bash
 dds-nodex --logs
 ```
+
 یا از طریق اجرای دستور dds-nodex و انتخاب مشاهده ی لاگ ها از منو میتوانید لاگ هارا به صورت زنده مشاهده کنید.
 
 <div dir="rtl">
@@ -258,33 +232,28 @@ dds-nodex --logs
 
 </div>
 
-
-
 ## ❓ پرسش‌های متداول
 
 ### آیا Nodex دادهٔ اصلی پنل را تغییر می‌دهد؟
+
 خیر؛ Nodex با API کار می‌کند و تغییرات را در سطح اینباند/کلاینت‌های نودها اعمال می‌کند.
 
 ### چند نود همزمان پشتیبانی می‌شود؟
+
 به‌صورت پیش‌فرض موازی‌سازی فعال است؛ با `NET_MAX_WORKERS` می‌توانید متناسب با منابع افزایش/کاهش دهید.
 
 ### اگر DB قدیمی دارم؟
+
 Nodex در شروع، در صورت وجود DB قدیمی در مسیرهای قدیمی، آن‌را به مسیر جدید مهاجرت می‌دهد (به‌همراه wal/shm).
-
-
-
-
-
 
 ## 📜 لایسنس
 
 این پروژه تحت مجوزی منتشر شده که در فایل `LICENSE` آمده است (در صورت عدم وجود، لطفاً مجوز مدنظرتان را اضافه کنید).
 
-
-
 ## 🧾 تغییرات (Changelog)
 
 ### v1.3
+
 - بهینه‌سازی موازی‌سازی درخواست‌ها
 - Healthcheck مبتنی بر `.heartbeat`
 - PRAGMAهای SQLite قابل تنظیم
